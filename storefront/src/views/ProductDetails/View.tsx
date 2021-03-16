@@ -43,8 +43,9 @@ const View: React.FC = () => {
 			variables: {
 				id
 			},
-			fetchPolicy: 'cache-and-network',
-			nextFetchPolicy: 'cache-first'
+			fetchPolicy: 'cache-first',
+			nextFetchPolicy: 'cache-first',
+			notifyOnNetworkStatusChange: true
 		}
 	)
 	const { data: reviews, loading: reviewsLoading, fetchMore } = useQuery<
@@ -58,8 +59,9 @@ const View: React.FC = () => {
 			}
 		},
 		skip: !data,
-		fetchPolicy: 'cache-and-network',
-		nextFetchPolicy: 'cache-first'
+		fetchPolicy: 'cache-first',
+		nextFetchPolicy: 'cache-first',
+		notifyOnNetworkStatusChange: true
 	})
 	const { data: categoryProductsData } = useQuery<
 		CategoryProducts,
@@ -70,7 +72,7 @@ const View: React.FC = () => {
 			firstProducts: 10
 		},
 		skip: !data,
-		fetchPolicy: 'cache-and-network',
+		fetchPolicy: 'cache-first',
 		nextFetchPolicy: 'cache-first'
 	})
 	const loadMoreReviews = async (): Promise<void> => {
@@ -116,7 +118,7 @@ const View: React.FC = () => {
 		150,
 		true
 	)
-	if (!data && loading) return null
+	if (!data && loading) return <Loader full={!data} absolute={!!data} />
 	return (
 		<MetaWrapper
 			meta={{

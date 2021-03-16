@@ -48,42 +48,23 @@ function ErrorFallback({ error, componentStack, resetErrorBoundary }) {
 	)
 }
 
+const Root = withApollo({ ssr: true })(({ Component, ...props }: any) => {
+	return (
+		<ShopProvider>
+			<CheckoutProvider>
+				<UserProvider>
+					<ErrorBoundary FallbackComponent={ErrorFallback}>
+						<StorefrontApp>
+							<Component {...props} />
+						</StorefrontApp>
+					</ErrorBoundary>
+				</UserProvider>
+			</CheckoutProvider>
+		</ShopProvider>
+	)
+})
+
 const AppWithApollo = ({ Component, pageProps }: AppProps) => {
-	const Root = withApollo({ ssr: true })((props) => {
-		return (
-			<NextQueryParamProvider>
-				{/*<ApolloProvider client={apollo}>*/}
-				<ShopProvider>
-					<CheckoutProvider>
-						{({ checkoutContext }) => (
-							<UserProvider
-								refreshUser={true}
-								onUserLogin={() => {
-									checkoutContext.findUserCheckout()
-								}}
-								onUserLogout={() => {
-									if (checkoutContext.checkout.token) {
-										checkoutContext.resetCheckout()
-									}
-								}}
-							>
-								<OverlayProvider>
-									<FavoritesProvider>
-										<ErrorBoundary FallbackComponent={ErrorFallback}>
-											<StorefrontApp>
-												<Component {...pageProps} />
-											</StorefrontApp>
-										</ErrorBoundary>
-									</FavoritesProvider>
-								</OverlayProvider>
-							</UserProvider>
-						)}
-					</CheckoutProvider>
-				</ShopProvider>
-				{/*</ApolloProvider>*/}
-			</NextQueryParamProvider>
-		)
-	})
 	React.useEffect(() => {
 		const jssStyles = document.querySelector('#jss-server-side')
 		if (jssStyles) {
@@ -103,7 +84,6 @@ const AppWithApollo = ({ Component, pageProps }: AppProps) => {
 			}
 		}
 	}, [pageProps.deviceType, defaultTheme])
-	// useRouteHistory()
 	return (
 		<ThemeProvider theme={theme}>
 			<SnackbarProvider
@@ -113,18 +93,14 @@ const AppWithApollo = ({ Component, pageProps }: AppProps) => {
 					vertical: 'bottom',
 					horizontal: 'left'
 				}}
-				// domRoot={document.getElementById("react-notification")}
 			>
-				{/*{ssrMode ? (*/}
-				{/*	<StaticRouter>*/}
-				{/*		<Root {...pageProps} />*/}
-				{/*	</StaticRouter>*/}
-				{/*) : (*/}
-				{/*	<Router history={history}>*/}
-				{/*		<Root {...pageProps} />*/}
-				{/*	</Router>*/}
-				{/*)}*/}
-				<Root {...pageProps} />
+				<NextQueryParamProvider>
+					<OverlayProvider>
+						<FavoritesProvider>
+							<Root Component={Component} {...pageProps} />
+						</FavoritesProvider>
+					</OverlayProvider>
+				</NextQueryParamProvider>
 			</SnackbarProvider>
 		</ThemeProvider>
 	)

@@ -15,8 +15,12 @@ import {
 	ProductsCardDetailsVariables
 } from '@sdk/queries/types/ProductsCardDetails'
 import { useQuery } from '@apollo/client'
-import { useBlogArticleListQuery } from '@sdk/queries/blog'
+import { blogArticleListQuery } from '@sdk/queries/blog'
 import useShop from '@temp/hooks/useShop'
+import {
+	BlogArticleList,
+	BlogArticleListVariables
+} from '@sdk/queries/types/BlogArticleList'
 
 const PAGINATE_BY = 12
 
@@ -31,7 +35,7 @@ const View: React.FC = () => {
 			sortBy: { direction: OrderDirection.DESC, field: ProductOrderField.DATE },
 			includeCategory: false
 		},
-		fetchPolicy: 'cache-and-network',
+		fetchPolicy: 'cache-first',
 		nextFetchPolicy: 'cache-first'
 		// ssr: false
 	})
@@ -47,14 +51,14 @@ const View: React.FC = () => {
 			},
 			includeCategory: false
 		},
-		fetchPolicy: 'cache-and-network',
+		fetchPolicy: 'cache-first',
 		nextFetchPolicy: 'cache-first'
 		// ssr: false
 	})
-	const {
-		data: articlesData,
-		loading: articlesLoading
-	} = useBlogArticleListQuery({
+	const { data: articlesData, loading: articlesLoading } = useQuery<
+		BlogArticleList,
+		BlogArticleListVariables
+	>(blogArticleListQuery, {
 		variables: {
 			first: PAGINATE_BY,
 			filter: { isPublished: true },
@@ -62,7 +66,9 @@ const View: React.FC = () => {
 				direction: OrderDirection.DESC,
 				field: BlogArticleOrderField.DATE
 			}
-		}
+		},
+		fetchPolicy: 'cache-first',
+		nextFetchPolicy: 'cache-first'
 	})
 	return (
 		<MetaWrapper meta={{}}>

@@ -60,16 +60,18 @@ def filter_search_stock(qs, _, value):
 
 def filter_categories_products(qs, _, value):
     category_id = value[0]
-    pk = from_global_id_strict_type(category_id, 'Category',
-                                    field="checkout_id")
-    root = Category.objects.filter(id=pk).first()
-    if root is None:
+    pk = from_global_id_strict_type(category_id, 'Category')
+    try:
+        root = Category.objects.filter(id=pk).first()
+        if root is None:
+            return qs.none()
+        tree = root.get_descendants(include_self=True)
+        qs = Product.objects.published()
+        qs = qs.filter(category__in=tree)
+        qs = qs.distinct()
+        return qs
+    except ValueError:
         return qs.none()
-    tree = root.get_descendants(include_self=True)
-    qs = Product.objects.published()
-    qs = qs.filter(category__in=tree)
-    qs = qs.distinct()
-    return qs
 
 
 def filter_attributes_by_product_types(qs, field, value):
@@ -77,10 +79,13 @@ def filter_attributes_by_product_types(qs, field, value):
         return qs
 
     if field == "in_category":
-        category_id = from_global_id_strict_type(
-            value, only_type="Category", field=field
-        )
-        category = Category.objects.filter(pk=category_id).first()
+        try:
+            category_id = from_global_id_strict_type(
+                value, only_type="Category", field=field
+            )
+            category = Category.objects.filter(pk=category_id).first()
+        except ValueError:
+            return qs.none()
 
         if category is None:
             return qs.none()

@@ -64,11 +64,7 @@ export interface ILocalCheckout {
 	email: string
 }
 
-const CheckoutProvider: React.FC<{
-	children: React.FC<{
-		checkoutContext: FavoritesContextInterface
-	}>
-}> = ({ children }) => {
+const CheckoutProvider: React.FC = ({ children }) => {
 	const client = useApolloClient()
 
 	const [checkout, setCheckout] = useLocalStorage<ILocalCheckout>(
@@ -322,7 +318,7 @@ const CheckoutProvider: React.FC<{
 
 	return (
 		<CheckoutContext.Provider value={context}>
-			{children({ checkoutContext: context })}
+			{children}
 		</CheckoutContext.Provider>
 	)
 }

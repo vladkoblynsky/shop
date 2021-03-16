@@ -149,7 +149,10 @@ class ProductQueries(graphene.ObjectType):
 
     @staticmethod
     def resolve_category(self, info, id):
-        return graphene.Node.get_node_from_global_id(info, id, Category)
+        try:
+            return graphene.Node.get_node_from_global_id(info, id, Category)
+        except ValueError:
+            return None
 
     @staticmethod
     def resolve_product(self, info, id):
