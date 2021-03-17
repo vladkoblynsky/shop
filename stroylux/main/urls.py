@@ -43,4 +43,4 @@ if settings.DEBUG:
         url(r"^static/(?P<path>.*)$", serve),
         # url(r"^", RedirectView.as_view(url="/graphql/")),
     ]
-urlpatterns += [url(r"^", csrf_exempt(TemplateView.as_view(template_name="index.html")))]
+# urlpatterns += [url(r"^", csrf_exempt(TemplateView.as_view(template_name="index.html")))]
