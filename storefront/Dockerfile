@@ -45,6 +45,7 @@ RUN API_URI=${API_URI} GTM_ID=${GTM_ID} DASHBOARD_URL=${DASHBOARD_URL} STOREFRON
 # Production image, copy all the files and run next
 FROM node:alpine AS runner
 WORKDIR /app
+RUN yarn global add pm2
 
 ENV NODE_ENV production
 ARG API_URI
@@ -58,9 +59,7 @@ ENV STOREFRONT_URL ${STOREFRONT_URL}
 ARG SSR_API_URL
 ENV SSR_API_URL ${SSR_API_URL}
 
-# You only need to copy next.config.js if you are NOT using the default configuration
 COPY --from=builder /app/next.config.js ./
-#COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 
@@ -71,4 +70,4 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["node_modules/.bin/next", "start"]
+#CMD ["node_modules/.bin/next", "start"]
