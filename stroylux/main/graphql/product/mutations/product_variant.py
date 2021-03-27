@@ -5,19 +5,22 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from main.core.permissions import ProductPermissions
-from main.graphql.core.mutations import ModelMutation, ModelDeleteMutation, ModelBulkDeleteMutation, BaseMutation
+from main.graphql.core.mutations import ModelMutation, ModelDeleteMutation, \
+    ModelBulkDeleteMutation, BaseMutation
 from main.graphql.core.scalars import Decimal, WeightScalar
-from main.graphql.core.types.common import ProductError, BulkProductError, BulkStockError, StockError
-from main.graphql.product.mutations.product import StockInput, AttributeAssignmentMixin, T_INPUT_MAP, \
+from main.graphql.core.types.common import ProductError, BulkProductError, \
+    BulkStockError, StockError
+from main.graphql.product.mutations.product import StockInput, \
+    AttributeAssignmentMixin, T_INPUT_MAP, \
     AttributeValueInput
 from main.graphql.product.types import ProductVariant, ProductImage, Stock
-from main.graphql.product.utils import create_stocks, get_used_attribute_values_for_variant, \
+from main.graphql.product.utils import create_stocks, \
+    get_used_attribute_values_for_variant, \
     get_used_variants_attribute_values
 from main.graphql.utils import get_database_id
 from main.product import models
 from main.product.error_codes import ProductErrorCode
-from main.product.models import AssignedVariantAttribute
-from main.product.tasks import update_product_variant_price_task, update_products_variant_prices_task
+from main.product.tasks import update_product_variant_price_task
 from main.product.utils.attributes import generate_name_for_variant
 
 
@@ -28,9 +31,11 @@ class ProductVariantInput(graphene.InputObjectType):
         description="List of attributes specific to this variant.",
     )
     cost_price = Decimal(description="Cost price of the variant.")
-    price_override = Decimal(description="Special price of the particular variant.")
+    price_override = Decimal(
+        description="Special price of the particular variant.")
     sku = graphene.String(description="Stock keeping unit.")
-    weight = WeightScalar(description="Weight of the Product Variant.", required=False)
+    weight = WeightScalar(description="Weight of the Product Variant.",
+                          required=False)
     name = graphene.String(description='Product variant name', required=False)
 
 
@@ -50,7 +55,8 @@ class ProductVariantCreateInput(ProductVariantInput):
 class ProductVariantCreate(ModelMutation):
     class Arguments:
         input = ProductVariantCreateInput(
-            required=True, description="Fields required to create a product variant."
+            required=True,
+            description="Fields required to create a product variant."
         )
 
     class Meta:
@@ -62,7 +68,7 @@ class ProductVariantCreate(ModelMutation):
 
     @classmethod
     def clean_attributes(
-            cls, attributes: dict, product_type: models.ProductType
+        cls, attributes: dict, product_type: models.ProductType
     ) -> T_INPUT_MAP:
         attributes_qs = product_type.variant_attributes
         attributes = AttributeAssignmentMixin.clean_input(
@@ -72,7 +78,7 @@ class ProductVariantCreate(ModelMutation):
 
     @classmethod
     def validate_duplicated_attribute_values(
-            cls, attributes, used_attribute_values, instance=None
+        cls, attributes, used_attribute_values, instance=None
     ):
         attribute_values = defaultdict(list)
         for attribute in attributes:
@@ -87,7 +93,7 @@ class ProductVariantCreate(ModelMutation):
 
     @classmethod
     def clean_input(
-            cls, info, instance: models.ProductVariant, data: dict, input_cls=None
+        cls, info, instance: models.ProductVariant, data: dict, input_cls=None
     ):
         cleaned_input = super().clean_input(info, instance, data)
 
@@ -192,7 +198,8 @@ class ProductVariantUpdate(ProductVariantCreate):
             required=True, description="ID of a product variant to update."
         )
         input = ProductVariantInput(
-            required=True, description="Fields required to update a product variant."
+            required=True,
+            description="Fields required to update a product variant."
         )
 
     class Meta:
@@ -204,19 +211,21 @@ class ProductVariantUpdate(ProductVariantCreate):
 
     @classmethod
     def validate_duplicated_attribute_values(
-            cls, attributes, used_attribute_values, instance=None
+        cls, attributes, used_attribute_values, instance=None
     ):
         # Check if the variant is getting updated,
         # and the assigned attributes do not change
         if instance.product_id is not None:
-            assigned_attributes = get_used_attribute_values_for_variant(instance)
+            assigned_attributes = get_used_attribute_values_for_variant(
+                instance)
             input_attribute_values = defaultdict(list)
             for attribute in attributes:
                 input_attribute_values[attribute.id].extend(attribute.values)
             if input_attribute_values == assigned_attributes:
                 return
         # if assigned attributes is getting updated run duplicated attribute validation
-        super().validate_duplicated_attribute_values(attributes, used_attribute_values)
+        super().validate_duplicated_attribute_values(attributes,
+                                                     used_attribute_values)
 
 
 class ProductVariantDelete(ModelDeleteMutation):
@@ -281,12 +290,12 @@ class ProductVariantBulkCreate(BaseMutation):
 
     @classmethod
     def clean_variant_input(
-            cls,
-            info,
-            instance: models.ProductVariant,
-            data: dict,
-            errors: dict,
-            variant_index: int,
+        cls,
+        info,
+        instance: models.ProductVariant,
+        data: dict,
+        errors: dict,
+        variant_index: int,
     ):
         cleaned_input = ModelMutation.clean_input(
             info, instance, data, input_cls=ProductVariantBulkCreateInput
@@ -315,7 +324,8 @@ class ProductVariantBulkCreate(BaseMutation):
         attributes = cleaned_input.get("attributes")
         if attributes:
             try:
-                cleaned_input["attributes"] = ProductVariantCreate.clean_attributes(
+                cleaned_input[
+                    "attributes"] = ProductVariantCreate.clean_attributes(
                     attributes, data["product_type"]
                 )
             except ValidationError as exc:
@@ -364,7 +374,8 @@ class ProductVariantBulkCreate(BaseMutation):
         if sku in sku_list:
             errors["sku"].append(
                 ValidationError(
-                    "Duplicated SKU.", ProductErrorCode.UNIQUE, params={"scss": index}
+                    "Duplicated SKU.", ProductErrorCode.UNIQUE,
+                    params={"scss": index}
                 )
             )
         sku_list.append(sku)
@@ -383,7 +394,8 @@ class ProductVariantBulkCreate(BaseMutation):
 
             if not variant_data.sku:
                 continue
-            cls.validate_duplicated_sku(variant_data.sku, index, sku_list, errors)
+            cls.validate_duplicated_sku(variant_data.sku, index, sku_list,
+                                        errors)
         return cleaned_inputs
 
     @classmethod
@@ -405,10 +417,12 @@ class ProductVariantBulkCreate(BaseMutation):
 
     @classmethod
     def perform_mutation(cls, root, info, **data):
-        product = cls.get_node_or_error(info, data["product_id"], models.Product)
+        product = cls.get_node_or_error(info, data["product_id"],
+                                        models.Product)
         errors = defaultdict(list)
 
-        cleaned_inputs = cls.clean_variants(info, data["variants"], product, errors)
+        cleaned_inputs = cls.clean_variants(info, data["variants"], product,
+                                            errors)
         instances = cls.create_variants(info, cleaned_inputs, product, errors)
         if errors:
             raise ValidationError(errors)
@@ -527,7 +541,7 @@ class ProductVariantStocksDelete(BaseMutation):
             required=True,
             description="ID of product variant for which stocks will be deleted.",
         )
-        stock_ids = graphene.List(graphene.NonNull(graphene.ID),)
+        stock_ids = graphene.List(graphene.NonNull(graphene.ID), )
 
     class Meta:
         description = "Delete stocks from product variant."
@@ -537,9 +551,12 @@ class ProductVariantStocksDelete(BaseMutation):
 
     @classmethod
     def perform_mutation(cls, root, info, **data):
-        variant = cls.get_node_or_error(info, data["variant_id"], only_type=ProductVariant)
-        pks = [get_database_id(None, node_id, Stock) for node_id in data['stock_ids']]
-        models.Stock.objects.filter(product_variant=variant, pk__in=pks).delete()
+        variant = cls.get_node_or_error(info, data["variant_id"],
+                                        only_type=ProductVariant)
+        pks = [get_database_id(None, node_id, Stock) for node_id in
+               data['stock_ids']]
+        models.Stock.objects.filter(product_variant=variant,
+                                    pk__in=pks).delete()
         return cls(product_variant=variant)
 
 
@@ -549,9 +566,11 @@ class VariantImageAssign(BaseMutation):
 
     class Arguments:
         image_id = graphene.ID(
-            required=True, description="ID of a product image to assign to a variant."
+            required=True,
+            description="ID of a product image to assign to a variant."
         )
-        variant_id = graphene.ID(required=True, description="ID of a product variant.")
+        variant_id = graphene.ID(required=True,
+                                 description="ID of a product variant.")
 
     class Meta:
         description = "Assign an image to a product variant."
@@ -595,7 +614,8 @@ class VariantImageUnassign(BaseMutation):
             required=True,
             description="ID of a product image to unassign from a variant.",
         )
-        variant_id = graphene.ID(required=True, description="ID of a product variant.")
+        variant_id = graphene.ID(required=True,
+                                 description="ID of a product variant.")
 
     class Meta:
         description = "Unassign an image from a product variant."

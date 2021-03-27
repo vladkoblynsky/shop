@@ -1,21 +1,21 @@
 import graphene
-from main.graphql.core.fields import register_graphene_fields
-
-from graphene_federation import build_schema
 from graphene_django.debug import DjangoDebug
+from graphene_federation import build_schema
 
-from .core.schema import CoreMutations, CoreQueries
+from main.graphql.core.fields import register_graphene_fields
 from .account.schema import AccountMutations, AccountQueries
+from .blog.schema import BlogQueries, BlogMutations
+from .checkout.schema import CheckoutQueries, CheckoutMutations
+from .core.schema import CoreMutations, CoreQueries
+from .export_import.schema import ImportExportMutations, ImportExportQueries
+from .order.schema import OrderQueries, OrderMutations
+from .page.schema import PageQueries, PageMutations
+from .payment.schema import PaymentMutations, PaymentQueries
 from .product.schema import ProductMutations, ProductQueries
 from .shipping.schema import ShippingMutations, ShippingQueries
-from .payment.schema import PaymentMutations, PaymentQueries
-from .checkout.schema import CheckoutQueries, CheckoutMutations
-from .order.schema import OrderQueries, OrderMutations
 from .shop.schema import ShopQueries, ShopMutations
-from .blog.schema import BlogQueries, BlogMutations
-from .page.schema import PageQueries, PageMutations
 
-register_graphene_fields() # Need for money field order
+register_graphene_fields()  # Need for money field order
 
 
 class Query(
@@ -28,7 +28,8 @@ class Query(
     OrderQueries,
     BlogQueries,
     ShopQueries,
-    PageQueries
+    PageQueries,
+    ImportExportQueries
 ):
     debug = graphene.Field(DjangoDebug, name='_debug')
 
@@ -43,7 +44,8 @@ class Mutation(
     OrderMutations,
     ShopMutations,
     BlogMutations,
-    PageMutations
+    PageMutations,
+    ImportExportMutations
 ):
     pass
 

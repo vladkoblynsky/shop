@@ -195,6 +195,7 @@ INSTALLED_APPS = [
     "main.graphql",
     "main.blog",
     "main.page",
+    "main.export_import",
     # External apps
     "versatileimagefield",
     "graphene_django",
@@ -207,7 +208,9 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'ckeditor',
     'sitemap_generate',
-    'corsheaders'
+    'corsheaders',
+    'import_export',
+    'private_storage',
 ]
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 if DEBUG:
@@ -445,3 +448,7 @@ else:
         traces_sample_rate=1.0,
         send_default_pii=True
     )
+
+PRIVATE_STORAGE_ROOT = os.path.join(PROJECT_ROOT, 'private-media')
+PRIVATE_STORAGE_AUTH_FUNCTION = 'private_storage.permissions.allow_staff'
+print(PRIVATE_STORAGE_ROOT)
