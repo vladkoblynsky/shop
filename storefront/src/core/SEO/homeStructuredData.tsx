@@ -28,11 +28,7 @@ export const homeStructuredData = (shop: ShopInfo_shop | null) => {
 		potentialAction: {
 			'@type': 'SearchAction',
 			'query-input': 'required name=q',
-			target: urljoin(
-				!ssrMode ? location.href : STOREFRONT_URL,
-				searchUrl,
-				'?q={q}'
-			)
+			target: urljoin(STOREFRONT_URL, searchUrl, '?q={q}')
 		},
 		url: !ssrMode ? location.href : STOREFRONT_URL
 	}

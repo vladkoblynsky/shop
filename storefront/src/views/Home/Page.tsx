@@ -18,6 +18,7 @@ import { ShopInfo_shop } from '@sdk/queries/types/ShopInfo'
 import { logoStructuredData } from '@temp/core/SEO/logoStructuredData'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Navigation } from 'swiper'
+import { ssrMode } from '@temp/constants'
 
 SwiperCore.use([Navigation])
 
@@ -133,6 +134,7 @@ const Page: React.FC<{
 								<Swiper
 									spaceBetween={0}
 									slidesPerView={1}
+									width={ssrMode ? 1200 : null}
 									navigation
 									breakpoints={breakPoints}
 								>
@@ -162,6 +164,7 @@ const Page: React.FC<{
 									slidesPerView={1}
 									navigation
 									breakpoints={breakPoints}
+									width={ssrMode ? 1200 : null}
 								>
 									{popularProducts.edges.map((edge, i) => {
 										return (

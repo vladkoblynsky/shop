@@ -3,7 +3,6 @@ import { each } from 'lodash'
 import { parse as parseQs } from 'query-string'
 import { MoneyRange } from '@sdk/fragments/types/MoneyRange'
 import { OrderDirection, ProductOrderField } from '@temp/types/globalTypes'
-import { useLocation } from 'react-router'
 import currencyFormatter from 'currency-formatter'
 const BYN_CURRENCY = {
 	code: 'UAH',
@@ -175,8 +174,4 @@ export function findValueInEnum<TEnum extends object>(
 	}
 
 	return (needle as unknown) as TEnum[keyof TEnum]
-}
-
-export function useUrlQuery() {
-	return new URLSearchParams(useLocation().search)
 }
