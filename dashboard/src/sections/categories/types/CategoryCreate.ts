@@ -39,6 +39,9 @@ export interface CategoryCreate_categoryCreate_category {
   name: string;
   descriptionJson: any;
   description: string;
+  /**
+   * Parent of the category.
+   */
   parent: CategoryCreate_categoryCreate_category_parent | null;
 }
 

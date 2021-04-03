@@ -31,6 +31,16 @@ class ProductVariantResource(resources.ModelResource):
                         'price']
 
 
+class ProductVariantImportResource(resources.ModelResource):
+    price = Field(attribute='price_override_amount', column_name='Цена')
+    unit = Field(attribute='product__unit', column_name='Ед.изм.')
+
+    class Meta:
+        model = ProductVariant
+        fields = ['id']
+        export_order = ['id', 'unit', 'price']
+
+
 @admin.register(ProductType, Category, ProductImage,
                 VariantImage, Stock, Allocation, ProductReview,
                 ProductReviewImage,

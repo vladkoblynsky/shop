@@ -197,6 +197,9 @@ export interface CategoryDetails_category {
   name: string;
   descriptionJson: any;
   description: string;
+  /**
+   * Parent of the category.
+   */
   parent: CategoryDetails_category_parent | null;
   /**
    * List of children of the category.

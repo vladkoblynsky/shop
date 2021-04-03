@@ -1,9 +1,10 @@
 import graphene
 
 from main.graphql.core.fields import FilterInputConnectionField
+from main.graphql.export_import.bulk_mutations import ExportObjBulkDelete
 from main.graphql.export_import.filters import ExportObjFilterInput
 from main.graphql.export_import.mutations import ProductVariantExport, \
-    ExportObjDelete
+    ExportObjDelete, ProductVariantImport
 from main.graphql.export_import.resolvers import resolve_export_obj_list
 from main.graphql.export_import.sorters import ExportObjOrder
 from main.graphql.export_import.types import ExportObjType
@@ -39,5 +40,7 @@ class ImportExportQueries:
 
 class ImportExportMutations(graphene.ObjectType):
     product_variant_export = ProductVariantExport.Field()
+    product_variant_import = ProductVariantImport.Field()
 
     export_obj_delete = ExportObjDelete.Field()
+    export_obj_bulk_delete = ExportObjBulkDelete.Field()

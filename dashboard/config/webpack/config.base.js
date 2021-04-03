@@ -164,7 +164,11 @@ module.exports = ({ sourceDir, distDir }) => ({
 			mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
 			devMode: 'webapp'
 		}),
-		new webpack.EnvironmentPlugin(['APP_MOUNT_URI', 'API_URI'])
+		new webpack.EnvironmentPlugin({
+			APP_MOUNT_URI: '/dashboard/',
+			API_URI: 'http://localhost:8000/graphql/',
+			STOREFRONT_URL: 'http://localhost:3000/'
+		})
 	],
 	node: {
 		fs: 'empty',

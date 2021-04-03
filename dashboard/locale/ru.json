@@ -1681,5 +1681,32 @@
   },
   "delete_products": {
     "string": "Вы уверенны, что хотите удалить товары?"
+  },
+  "exportProducts": {
+    "string": "Экспорт"
+  },
+  "created": {
+    "string": "Созданный"
+  },
+  "fileName": {
+    "string": "Файл"
+  },
+  "download": {
+    "string": "Скачать"
+  },
+  "no_export_obj_found": {
+    "string": "Список экспортов пустой"
+  },
+  "deleteExportsTitle": {
+    "string": "Удалить экспорты"
+  },
+  "deleteExports": {
+    "string": "Вы уверенны, что хотите удалить экспорты?"
+  },
+  "exportImportProducts": {
+    "string": "Экспорт / Импорт"
+  },
+  "importProducts": {
+    "string": "Импорт"
   }
 }

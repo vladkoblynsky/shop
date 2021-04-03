@@ -2,6 +2,7 @@ import graphene
 from graphene import relay
 from graphene_federation import key
 
+from main.core.utils import build_absolute_uri
 from main.export_import.models import ExportObj
 from main.graphql.core.connection import CountableDjangoObjectType
 
@@ -21,4 +22,4 @@ class ExportObjType(CountableDjangoObjectType):
         return self.file_name
 
     def resolve_storage_url(self: ExportObj, info):
-        return self.storage_url
+        return build_absolute_uri(self.storage_url)

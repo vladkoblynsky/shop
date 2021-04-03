@@ -39,6 +39,9 @@ export interface CategoryUpdate_categoryUpdate_category {
   name: string;
   descriptionJson: any;
   description: string;
+  /**
+   * Parent of the category.
+   */
   parent: CategoryUpdate_categoryUpdate_category_parent | null;
 }
 

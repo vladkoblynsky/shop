@@ -21,6 +21,7 @@ services:
       - /app/main/static/assets
       - ./stroylux/media/:/app/media:Z
       - ./stroylux/private-media/:/app/private-media:Z
+      - temp_volume:/tmp
     command: python manage.py runserver 0.0.0.0:8000
     env_file: ./stroylux/common.env
 
@@ -98,6 +99,7 @@ services:
       - ./stroylux/templates/:/app/templates:Z
       - ./stroylux/media/:/app/media:Z
       - ./stroylux/private-media/:/app/private-media:Z
+      - temp_volume:/tmp
 
   smtp:
     image: mailhog/mailhog:v1.0.0
@@ -124,3 +126,4 @@ volumes:
   stroylux-redis:
   static_volume:
   stroylux-media:
+  temp_volume:

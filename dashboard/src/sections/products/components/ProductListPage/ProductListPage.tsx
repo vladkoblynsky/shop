@@ -8,6 +8,7 @@ import Card from '@material-ui/core/Card'
 import DeleteIcon from '@material-ui/icons/Delete'
 import {
 	productAddUrl,
+	productExportUrl,
 	productListUrl,
 	ProductListUrlDialog,
 	ProductListUrlQueryParams,
@@ -48,6 +49,7 @@ import useNotifier from '@temp/hooks/useNotifier'
 import IconButton from '@material-ui/core/IconButton'
 import ActionDialog from '@temp/components/ActionDialog'
 import DialogContentText from '@material-ui/core/DialogContentText'
+import ButtonGroup from '@material-ui/core/ButtonGroup'
 
 const PRODUCT_LIST_TABS = 'productListTabs'
 
@@ -215,17 +217,30 @@ const ProductListPage: React.FC<{
 												<PageHeader
 													title={intl.formatMessage(sectionNames.products)}
 												>
-													<Button
-														onClick={() => navigate(productAddUrl)}
-														color='primary'
-														variant='contained'
-														data-tc='add-product'
-													>
-														<FormattedMessage
-															{...buttonMessages.createProduct}
-															description='button'
-														/>
-													</Button>
+													<ButtonGroup>
+														<Button
+															onClick={() => navigate(productExportUrl)}
+															color='primary'
+															variant='outlined'
+															data-tc='export-products'
+														>
+															<FormattedMessage
+																{...buttonMessages.exportImportProducts}
+																description='export'
+															/>
+														</Button>
+														<Button
+															onClick={() => navigate(productAddUrl)}
+															color='primary'
+															variant='contained'
+															data-tc='add-product'
+														>
+															<FormattedMessage
+																{...buttonMessages.createProduct}
+																description='button'
+															/>
+														</Button>
+													</ButtonGroup>
 												</PageHeader>
 												<Card>
 													<FilterBar

@@ -1,21 +1,21 @@
 from uuid import uuid4
 
 import graphene
-from import_export.admin import ExportMixin
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from import_export.admin import ExportMixin, ImportMixin
 
 from main.core.exceptions import PermissionDenied
 from main.core.permissions import ProductPermissions
 from main.core.utils import build_absolute_uri
-from main.graphql.core.mutations import BaseMutation, ModelMutation, \
-    ModelDeleteMutation
+from main.export_import.models import ExportObj
+from main.export_import.tasks import create_product_variant_export_file, \
+    product_variant_import
+from main.graphql.core.mutations import BaseMutation, ModelDeleteMutation
+from main.graphql.core.types import Upload
 from main.graphql.core.types.common import ProductError
 from main.graphql.core.utils import str_to_enum
-from main.export_import import ExportObjStatus
 from main.graphql.export_import.types import ExportObjType
 from main.product.models import ProductVariant
-from main.export_import.models import ExportObj
-from django.apps import apps
-from main.export_import.tasks import create_product_variant_export_file
 
 
 class ProductVariantExport(BaseMutation):
@@ -39,9 +39,7 @@ class ProductVariantExport(BaseMutation):
 
     @classmethod
     def perform_mutation(cls, root, info, **data):
-        print(info.context, data)
-
-        # file_format = data.get('file_format', 'xlsx')
+        file_format = data.get('file_format', 'xlsx')
         file_url = str(uuid4())
         url = build_absolute_uri(f"/download/{file_url}")
         export_obj = ExportObj.objects.create(
@@ -49,7 +47,7 @@ class ProductVariantExport(BaseMutation):
             model_name='ProductVariant',
             queryset=list(ProductVariant.objects.values_list('id', flat=True))
         )
-        create_product_variant_export_file.delay(export_obj.id)
+        create_product_variant_export_file.delay(export_obj.id, file_format)
         return cls(url=url)
 
 
@@ -80,3 +78,39 @@ class ExportObjDelete(ModelDeleteMutation):
 
         instance.id = db_id
         return cls.success_response(instance)
+
+FILE_FORMAT = {
+    'csv': 0,
+    'xls': 1,
+    'xlsx': 2,
+    'tsv': 3,
+    'json': 4,
+    'yaml': 5
+}
+class ProductVariantImport(BaseMutation):
+    class Arguments:
+        file = Upload(
+            required=True,
+            description="Represents a file in a multipart request.",
+        )
+
+    class Meta:
+        description = (
+            "Import product variants from file"
+        )
+        permissions = (ProductPermissions.MANAGE_PRODUCTS,)
+        error_type_class = ProductError
+        error_type_field = "product_errors"
+
+    @classmethod
+    def perform_mutation(cls, root, info, **data):
+        file_format = FILE_FORMAT.get('xlsx', FILE_FORMAT['xlsx'])
+        file_index = data.get('file')
+        file: InMemoryUploadedFile = info.context.FILES.get(file_index)
+        if file:
+            import_mixin = ImportMixin()
+            import_formats = import_mixin.get_import_formats()
+            input_format = import_formats[file_format]()
+            tmp_storage = import_mixin.write_to_tmp_storage(file, input_format)
+            product_variant_import.delay(tmp_storage.name, file_format)
+        return cls()

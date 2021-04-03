@@ -37,5 +37,8 @@ export interface CategoryDetailsFragment {
   name: string;
   descriptionJson: any;
   description: string;
+  /**
+   * Parent of the category.
+   */
   parent: CategoryDetailsFragment_parent | null;
 }

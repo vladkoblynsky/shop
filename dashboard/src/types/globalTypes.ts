@@ -363,6 +363,34 @@ export enum CountryCode {
   ZW = "ZW",
 }
 
+export enum ExportObjOrderField {
+  DATE = "DATE",
+  STATUS = "STATUS",
+}
+
+/**
+ * An enumeration.
+ */
+export enum ExportObjStatus {
+  ERROR = "ERROR",
+  IN_PROGRESS = "IN_PROGRESS",
+  SUCCESS = "SUCCESS",
+}
+
+/**
+ * An enumeration.
+ */
+export enum FileFormatEnum {
+  CSV = "CSV",
+  HTML = "HTML",
+  JSON = "JSON",
+  ODS = "ODS",
+  TSV = "TSV",
+  XLS = "XLS",
+  XLSX = "XLSX",
+  YAML = "YAML",
+}
+
 export enum OrderAction {
   CAPTURE = "CAPTURE",
   MARK_AS_PAID = "MARK_AS_PAID",
@@ -819,6 +847,16 @@ export interface DraftOrderInput {
   shippingAddress?: AddressInput | null;
   shippingMethod?: string | null;
   customerNote?: string | null;
+}
+
+export interface ExportObjFilterInput {
+  status?: string | null;
+}
+
+export interface ExportObjOrder {
+  direction: OrderDirection;
+  attributeId?: string | null;
+  field?: ExportObjOrderField | null;
 }
 
 export interface IntRangeInput {

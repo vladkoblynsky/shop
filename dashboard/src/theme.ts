@@ -46,7 +46,7 @@ export default (colors: IThemeColors): Theme =>
 					}
 				},
 				label: {
-					color: colors.font.button,
+					// color: colors.font.button,
 					fontWeight: 600
 				},
 				root: {
@@ -54,11 +54,6 @@ export default (colors: IThemeColors): Theme =>
 						marginLeft: 8
 					},
 					borderRadius: 4
-				},
-				text: {
-					'& span': {
-						color: colors.font.default
-					}
 				},
 				textPrimary: {
 					'& span': {
@@ -218,10 +213,6 @@ export default (colors: IThemeColors): Theme =>
 						}
 					},
 					color: fade(colors.input.text, 0.6)
-				},
-				shrink: {
-					// Negates x0.75 scale
-					// width: "133%"
 				}
 			},
 			MuiList: {
