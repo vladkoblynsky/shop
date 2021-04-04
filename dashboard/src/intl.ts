@@ -534,6 +534,11 @@ export const sectionNames = defineMessages({
 		defaultMessage: 'Products',
 		description: 'products section name'
 	},
+	exportImportList: {
+		id: 'exportImportList',
+		defaultMessage: 'Export / Import',
+		description: 'product variants export/import section name'
+	},
 	categories: {
 		id: 'categories',
 		defaultMessage: 'Categories',

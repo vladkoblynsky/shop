@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,14 +11,16 @@ from import_export.results import Result
 from . import ExportObjStatus
 from .models import ExportObj
 from ..celeryconf import app
-from ..product.admin import ProductVariantResource, \
+from ..product.admin import ProductVariantExportResource, \
     ProductVariantImportResource
+
+logger = logging.getLogger(__name__)
 
 
 @app.task
 def create_product_variant_export_file(instance_id: str or int,
                                        file_format: str):
-    dataset = ProductVariantResource().export()
+    dataset = ProductVariantExportResource().export()
     dataset_file = getattr(dataset, file_format)
     file = File(
         ContentFile(dataset_file),
@@ -27,9 +30,14 @@ def create_product_variant_export_file(instance_id: str or int,
         obj = ExportObj.objects.get(pk=instance_id)
         obj.file = file
         obj.status = ExportObjStatus.SUCCESS
-        obj.save(update_fields=['file', 'status'])
+        obj.save()
     except ObjectDoesNotExist:
         return None
+    except Exception as e:
+        logger.error(e)
+        obj = ExportObj.objects.get(pk=instance_id)
+        obj.status = ExportObjStatus.ERROR
+        obj.save()
 
 
 @app.task

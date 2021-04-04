@@ -17,27 +17,27 @@ class ProductResource(resources.ModelResource):
         fields = ['id', 'name']
 
 
-class ProductVariantResource(resources.ModelResource):
-    product_name = Field(attribute='product__name', column_name='Продукт')
+class BaseProductVariantResource(resources.ModelResource):
     price = Field(attribute='price_override_amount', column_name='Цена')
-    sku = Field(attribute='sku', column_name='Единица складского учёта')
-    name = Field(attribute='name', column_name='Вариант')
     unit = Field(attribute='product__unit', column_name='Ед.изм.')
 
     class Meta:
         model = ProductVariant
         fields = ['id']
+
+
+class ProductVariantExportResource(BaseProductVariantResource):
+    product_name = Field(attribute='product__name', column_name='Продукт')
+    sku = Field(attribute='sku', column_name='Единица складского учёта')
+    name = Field(attribute='name', column_name='Вариант')
+
+    class Meta(BaseProductVariantResource.Meta):
         export_order = ['id', 'product_name', 'name', 'sku', 'unit',
                         'price']
 
 
-class ProductVariantImportResource(resources.ModelResource):
-    price = Field(attribute='price_override_amount', column_name='Цена')
-    unit = Field(attribute='product__unit', column_name='Ед.изм.')
-
-    class Meta:
-        model = ProductVariant
-        fields = ['id']
+class ProductVariantImportResource(BaseProductVariantResource):
+    class Meta(BaseProductVariantResource.Meta):
         export_order = ['id', 'unit', 'price']
 
 
@@ -58,7 +58,7 @@ class AttributeVariantInline(admin.TabularInline):
 class ProductVariantAdmin(ImportExportModelAdmin):
     exclude = ['weight', 'price_override', 'cost_price']
     inlines = (AttributeVariantInline,)
-    resource_class = ProductVariantResource
+    resource_class = ProductVariantExportResource
 
 
 class AttributeProductInline(admin.TabularInline):

@@ -9,6 +9,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import {
 	productExportListUrl,
 	ProductExportListUrlDialog,
+	productListUrl,
 	TProductExportParams,
 	TSetProductExportParams
 } from '@temp/sections/products/urls'
@@ -39,6 +40,8 @@ import { ExportObjListVariables } from '@temp/sections/products/types/ExportObjL
 import ProductExportList from '@temp/sections/products/components/ProductExportList/ProductExportList'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import { ExportObjBulkDelete } from '@temp/sections/products/types/ExportObjBulkDelete'
+import AppHeader from '@temp/components/AppHeader'
+import useAppState from '@temp/hooks/useAppState'
 
 const STORAGE_TABS_KEY = 'productExportListTabs'
 
@@ -65,6 +68,7 @@ const ProductExportListPage: React.FC<{
 	const paginate = usePaginator()
 	const navigate = useNavigator()
 	const notify = useNotifier()
+	const [, dispatchAppState] = useAppState()
 	const { isSelected, listElements, reset, toggle, toggleAll } = useBulkActions(
 		params.ids
 	)
@@ -155,6 +159,9 @@ const ProductExportListPage: React.FC<{
 		const asc = params.sort === sort ? !params.asc : true
 		changeUrlParams({ sort, asc })
 	}
+	const onBack = () => {
+		navigate(productListUrl())
+	}
 	return (
 		<TypedProductExportListQuery displayLoader variables={queryVariables}>
 			{({ data, loading, refetch }) => {
@@ -191,18 +198,21 @@ const ProductExportListPage: React.FC<{
 									>
 										{(productVariantImport, productVariantImportOpts) => (
 											<>
+												<AppHeader onBack={onBack}>
+													{intl.formatMessage(sectionNames.products)}
+												</AppHeader>
 												<PageHeader
-													title={intl.formatMessage(sectionNames.products)}
+													title={intl.formatMessage(
+														sectionNames.exportImportList
+													)}
 												>
 													<ButtonGroup>
 														<Button
-															onClick={() => {
-																console.log('import products')
-															}}
 															color='primary'
 															variant='outlined'
 															data-tc='import-products'
 															component='label'
+															disabled={productVariantImportOpts.loading}
 														>
 															<FormattedMessage
 																{...buttonMessages.importProducts}
@@ -212,6 +222,10 @@ const ProductExportListPage: React.FC<{
 																type='file'
 																onChange={async (e) => {
 																	if (!!e.target?.files?.length) {
+																		dispatchAppState({
+																			type: 'displayLoader',
+																			payload: { value: true }
+																		})
 																		await productVariantImport({
 																			context: {
 																				useBatching: false
@@ -228,11 +242,16 @@ const ProductExportListPage: React.FC<{
 														</Button>
 														<Button
 															onClick={async () => {
+																dispatchAppState({
+																	type: 'displayLoader',
+																	payload: { value: true }
+																})
 																await productVariantExport()
 															}}
 															color='primary'
 															variant='contained'
 															data-tc='export-products'
+															disabled={productVariantExportOpts.loading}
 														>
 															<FormattedMessage
 																{...buttonMessages.exportProducts}

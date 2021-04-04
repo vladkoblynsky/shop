@@ -47,7 +47,12 @@ class ProductVariantExport(BaseMutation):
             model_name='ProductVariant',
             queryset=list(ProductVariant.objects.values_list('id', flat=True))
         )
-        create_product_variant_export_file.delay(export_obj.id, file_format)
+        if ProductVariant.objects.count() < 10000:
+            create_product_variant_export_file(export_obj.id,
+                                               file_format)
+        else:
+            create_product_variant_export_file.delay(export_obj.id,
+                                                     file_format)
         return cls(url=url)
 
 
@@ -79,6 +84,7 @@ class ExportObjDelete(ModelDeleteMutation):
         instance.id = db_id
         return cls.success_response(instance)
 
+
 FILE_FORMAT = {
     'csv': 0,
     'xls': 1,
@@ -87,6 +93,8 @@ FILE_FORMAT = {
     'json': 4,
     'yaml': 5
 }
+
+
 class ProductVariantImport(BaseMutation):
     class Arguments:
         file = Upload(
