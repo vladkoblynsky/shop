@@ -11,10 +11,19 @@ from .models import (Product, ProductType, Category, ProductVariant,
                      AssignedVariantAttribute, AssignedProductAttribute)
 
 
-class ProductResource(resources.ModelResource):
+class BaseProductResource(resources.ModelResource):
+    name = Field(attribute='name', column_name='Продукт')
+    description = Field(attribute='description', column_name='Описание')
+    unit = Field(attribute='unit', column_name='Ед.изм.')
+
     class Meta:
         model = Product
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'description', 'unit']
+
+
+class ProductExportResource(BaseProductResource):
+    class Meta(BaseProductResource.Meta):
+        export_order = ['id', 'name', 'description', 'unit']
 
 
 class BaseProductVariantResource(resources.ModelResource):

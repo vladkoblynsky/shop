@@ -12,7 +12,7 @@ from . import ExportObjStatus
 from .models import ExportObj
 from ..celeryconf import app
 from ..product.admin import ProductVariantExportResource, \
-    ProductVariantImportResource
+    ProductVariantImportResource, ProductExportResource
 
 logger = logging.getLogger(__name__)
 
@@ -56,3 +56,26 @@ def product_variant_import(file_name: str,
                                                                 dry_run=True)
     if not result.has_errors():
         ProductVariantImportResource().import_data(dataset, dry_run=False)
+
+
+@app.task
+def create_product_export_file(instance_id: str or int,
+                               file_format: str):
+    dataset = ProductExportResource().export()
+    dataset_file = getattr(dataset, file_format)
+    file = File(
+        ContentFile(dataset_file),
+        name=f"Products {datetime.now().strftime('%Y-%m-%d %H%M%S')}.${file_format}"
+    )
+    try:
+        obj = ExportObj.objects.get(pk=instance_id)
+        obj.file = file
+        obj.status = ExportObjStatus.SUCCESS
+        obj.save()
+    except ObjectDoesNotExist:
+        return None
+    except Exception as e:
+        logger.error(e)
+        obj = ExportObj.objects.get(pk=instance_id)
+        obj.status = ExportObjStatus.ERROR
+        obj.save()
