@@ -73,6 +73,7 @@ PyJWT==1.7.1
 python-dateutil==2.8.1
 python-magic==0.4.15;sys_platform == 'darwin'
 python-magic-bin;sys_platform == 'win32'
+python-slugify==5.0.2
 pytz==2019.3
 redis==3.4.1
 requests==2.23.0

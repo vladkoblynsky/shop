@@ -44,6 +44,9 @@ class Category(MPTTModel):
         upload_to="category-backgrounds", blank=True, null=True
     )
     background_image_alt = models.CharField(max_length=128, blank=True)
+    is_published = models.BooleanField(default=True)
+    seo_title = models.CharField(max_length=250, blank=True, default='')
+    seo_description = models.CharField(max_length=250, blank=True, default='')
 
     objects = models.Manager()
     tree = TreeManager()
@@ -139,6 +142,8 @@ class Product(PublishableModel):
     created_at = models.DateTimeField(default=timezone.now, null=True)
     unit = models.CharField(max_length=50, default='pcs', blank=True,
                             null=True)
+    seo_title = models.CharField(max_length=250, blank=True, default='')
+    seo_description = models.CharField(max_length=250, blank=True, default='')
     objects = ProductsQueryset.as_manager()
 
     class Meta:
