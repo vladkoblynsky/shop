@@ -19,7 +19,7 @@ import { NumberParam, useQueryParams } from 'use-query-params'
 
 const useStyles = makeStyles((theme) => ({
 	root: {
-		minHeight: 400
+		// minHeight: 400
 		// padding: "0 20px 20px 20px"
 	},
 	reviewsCount: {
@@ -73,7 +73,7 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
 	const [query, setQuery] = useQueryParams({ tab: NumberParam })
 
 	const onSelectReviewsTab = (e) => {
-		setQuery({ ...query, tab: 2 })
+		setQuery({ ...query, tab: 1 })
 	}
 
 	return (
@@ -81,7 +81,9 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({
 			<div className='flex-1 mb-10'>
 				<div>
 					<Typography variant='h2' className={'break-words'} gutterBottom>
-						{product.name}
+						<span className='font-bold text-xl md:text-4xl md:font-normal'>
+							{product.name}
+						</span>
 					</Typography>
 					<div className='flex items-center justify-between flex-wrap'>
 						<div className='flex items-center flex-1 min-w-200'>

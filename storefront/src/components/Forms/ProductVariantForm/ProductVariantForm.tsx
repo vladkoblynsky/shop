@@ -17,14 +17,24 @@ import {
 	getProductVariantsAttributes,
 	selectVariantByAttributes
 } from '@temp/views/ProductDetails/utils'
-import MenuItem from '@material-ui/core/MenuItem'
-import Select from '@material-ui/core/Select'
-import InputLabel from '@material-ui/core/InputLabel'
 import { makeStyles } from '@material-ui/core/styles'
+import Chip from '@material-ui/core/Chip'
+import Divider from '@material-ui/core/Divider'
 
 const useStyles = makeStyles((theme) => ({
 	select: {
 		padding: '10px 14px'
+	},
+	chipsRoot: {
+		display: 'flex',
+		flexWrap: 'wrap',
+		'& > *': {
+			margin: theme.spacing(0.5)
+		}
+	},
+	chipsLabel: {
+		paddingLeft: 5,
+		color: '#000'
 	}
 }))
 
@@ -35,11 +45,14 @@ export type TFormProductVariantData = {
 
 interface ProductVariantFormProps {
 	product: ProductWithVariants
-	addVariantToCheckoutSubmit(values: TFormProductVariantData): void
-	setSelectedVariant(variant: ProductVariant | null): void
-	setSelectedQuantity(quantity: number)
 	selectedVariant: ProductVariant | null
 	checkoutVariantQuantity: (selectedVariantId: string) => number
+
+	addVariantToCheckoutSubmit(values: TFormProductVariantData): void
+
+	setSelectedVariant(variant: ProductVariant | null): void
+
+	setSelectedQuantity(quantity: number)
 }
 
 const getInitialAttributes = (
@@ -121,10 +134,10 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
 		form.resetForm()
 	}, [product])
 
-	const onChangeAttribute = (attrId) => (e) => {
+	const onChangeAttributeChip = (attrId, value) => () => {
 		const newAttrs = {
 			...selectedAttrs,
-			[attrId]: e.target.value
+			[attrId]: value
 		}
 		setSelectedAttrs(newAttrs)
 		const newSelectedVariant = selectVariantByAttributes(
@@ -134,71 +147,48 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
 		form.setFieldValue('variant', newSelectedVariant?.id)
 	}
 
+	const isDisabledChip = (attrId, value): boolean => {
+		const newAttrs = {
+			...selectedAttrs,
+			[attrId]: value
+		}
+		return !selectVariantByAttributes(product.variants, newAttrs)
+	}
+
 	return (
 		<div className='product-form'>
 			<form onSubmit={form.handleSubmit}>
 				<Grid container spacing={0}>
 					{attributes.map((attr) => {
-						const options = attr.values.map((val) => ({
-							label: val.name,
-							value: val.id
-						}))
-						if (!options.length) return null
+						const options = attr.values
+							.map((val) => ({
+								label: val.name,
+								value: val.id
+							}))
+							.filter((opt) => !isDisabledChip(attr.id, opt.value))
+						if (options.length < 2) return null
 						return (
 							<Grid key={attr.id} item xs={12}>
-								<FormControl margin='normal' fullWidth>
-									<InputLabel id={`variant-select-label_${attr.id}`}>
-										{attr.name}
-									</InputLabel>
-									<Select
-										labelId={`variant-select-label_${attr.id}`}
-										id='variant-select'
-										value={selectedAttrs[attr.id] || null}
-										onChange={onChangeAttribute(attr.id)}
-										variant='outlined'
-										label={attr.name}
-										MenuProps={{
-											variant: 'menu'
-										}}
-										classes={{
-											outlined: classes.select
-										}}
-										fullWidth
-									>
-										{options.map((opt, i) => {
-											return (
-												<MenuItem key={i} value={opt.value}>
-													{opt.label}
-												</MenuItem>
-											)
-										})}
-									</Select>
-								</FormControl>
-								{/*<Autocomplete*/}
-								{/*    id={attr.id}*/}
-								{/*    options={options}*/}
-								{/*    onChange={onChangeAttribute(attr.id)}*/}
-								{/*    value={selectedAttrs[attr.id] || null}*/}
-								{/*    disableClearable*/}
-								{/*    autoHighlight*/}
-								{/*    getOptionLabel={option => option?.label || null}*/}
-								{/*    renderOption={option => option?.label || null}*/}
-								{/*    getOptionSelected={(option, value) => option?.value === value.value}*/}
-								{/*    size="small"*/}
-								{/*    noOptionsText="Нет вариантов"*/}
-								{/*    renderInput={params => (*/}
-								{/*        <TextField*/}
-								{/*            {...params}*/}
-								{/*            label={attr.name}*/}
-								{/*            variant="outlined"*/}
-								{/*            fullWidth*/}
-								{/*            inputProps={{*/}
-								{/*                ...params.inputProps*/}
-								{/*            }}*/}
-								{/*        />*/}
-								{/*    )}*/}
-								{/*    fullWidth*/}
-								{/*/>*/}
+								<div className={classes.chipsLabel}>{attr.name}</div>
+								<div className={classes.chipsRoot}>
+									{options.map((opt, idx) => (
+										<Chip
+											label={opt.label}
+											key={idx}
+											variant={
+												selectedAttrs[attr.id] === opt.value
+													? 'default'
+													: 'outlined'
+											}
+											onClick={onChangeAttributeChip(attr.id, opt.value)}
+											// size='small'
+											color='secondary'
+										/>
+									))}
+								</div>
+								<div className='my-10'>
+									<Divider />
+								</div>
 							</Grid>
 						)
 					})}
