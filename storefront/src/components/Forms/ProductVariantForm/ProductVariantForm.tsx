@@ -160,31 +160,32 @@ const ProductVariantForm: React.FC<ProductVariantFormProps> = ({
 			<form onSubmit={form.handleSubmit}>
 				<Grid container spacing={0}>
 					{attributes.map((attr) => {
-						const options = attr.values
-							.map((val) => ({
-								label: val.name,
-								value: val.id
-							}))
-							.filter((opt) => !isDisabledChip(attr.id, opt.value))
+						const options = attr.values.map((val) => ({
+							label: val.name,
+							value: val.id
+						}))
+
 						if (options.length < 2) return null
 						return (
 							<Grid key={attr.id} item xs={12}>
 								<div className={classes.chipsLabel}>{attr.name}</div>
 								<div className={classes.chipsRoot}>
-									{options.map((opt, idx) => (
-										<Chip
-											label={opt.label}
-											key={idx}
-											variant={
-												selectedAttrs[attr.id] === opt.value
-													? 'default'
-													: 'outlined'
-											}
-											onClick={onChangeAttributeChip(attr.id, opt.value)}
-											// size='small'
-											color='secondary'
-										/>
-									))}
+									{options
+										.filter((opt) => !isDisabledChip(attr.id, opt.value))
+										.map((opt, idx) => (
+											<Chip
+												label={opt.label}
+												key={idx}
+												variant={
+													selectedAttrs[attr.id] === opt.value
+														? 'default'
+														: 'outlined'
+												}
+												onClick={onChangeAttributeChip(attr.id, opt.value)}
+												// size='small'
+												color='secondary'
+											/>
+										))}
 								</div>
 								<div className='my-10'>
 									<Divider />
