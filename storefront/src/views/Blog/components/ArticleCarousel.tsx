@@ -8,9 +8,6 @@ import { ArticleCard } from '@temp/components/ArticleCard'
 import { IArticleCard } from '@temp/components/ArticleCard/ArticleCard'
 import { dateToShortString } from '@temp/core/utils'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Navigation } from 'swiper'
-
-SwiperCore.use([Navigation])
 
 const useStyles = makeStyles((theme) => ({
 	root: {

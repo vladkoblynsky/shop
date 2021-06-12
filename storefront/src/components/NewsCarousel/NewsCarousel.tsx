@@ -4,9 +4,6 @@ import React from 'react'
 import { IArticleCard } from '@temp/components/ArticleCard/ArticleCard'
 import { ArticleCard } from '@temp/components/ArticleCard'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Navigation } from 'swiper'
-
-SwiperCore.use([Navigation])
 
 const breakPoints = {
 	0: {

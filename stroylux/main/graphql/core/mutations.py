@@ -23,6 +23,7 @@ from ..account.types import User
 from ...account import models
 from ...account.error_codes import AccountErrorCode
 from ...core.permissions import AccountPermissions
+from django.contrib import auth
 
 
 def get_model_name(model):
@@ -109,6 +110,7 @@ class CreateToken(ObtainJSONWebToken):
     def mutate(cls, root, info, **kwargs):
         try:
             result = super().mutate(root, info, **kwargs)
+            auth.login(info.context, result.user)
         except JSONWebTokenError as e:
             errors = [Error(message=str(e))]
             account_errors = [
@@ -151,7 +153,9 @@ class VerifyToken(Verify):
     @classmethod
     def mutate(cls, root, info, token, **kwargs):
         try:
-            return super().mutate(root, info, token, **kwargs)
+            result = super().mutate(root, info, token, **kwargs)
+            auth.login(info.context, result.user)
+            return result
         except JSONWebTokenError:
             return None
 

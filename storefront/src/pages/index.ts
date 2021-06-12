@@ -1,4 +1,2 @@
 import { HomePage } from '../views/Home'
-import { withApollo } from '@temp/core/withApollo'
-
-export default withApollo({ ssr: true })(HomePage)
+export default HomePage

@@ -2,14 +2,11 @@ import './scss/ProductCarousel.scss'
 
 import React, { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Thumbs, Navigation, Lazy } from 'swiper'
 import { ProductDetails_product_images } from '@sdk/queries/types/ProductDetails'
 import { ProductVariant_images } from '@sdk/fragments/types/ProductVariant'
 import PlaceHolder from 'images/placeholder.svg'
 import { Hidden } from '@material-ui/core'
 import Viewer from '@temp/components/ProductCarousel/Viewer'
-
-SwiperCore.use([Thumbs, Navigation, Lazy])
 
 type ProductCarouselProps = {
 	images: ProductDetails_product_images[] | ProductVariant_images[] | null

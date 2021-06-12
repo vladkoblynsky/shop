@@ -7,9 +7,6 @@ import { makeStyles } from '@material-ui/core/styles'
 import { useTheme } from '@material-ui/core'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Thumbs, Navigation, Lazy, Pagination } from 'swiper'
-
-SwiperCore.use([Thumbs, Navigation, Lazy, Pagination])
 
 const useStyles = makeStyles((theme) => ({
 	imgDescription: {

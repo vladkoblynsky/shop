@@ -17,10 +17,7 @@ import { Skeleton } from '@material-ui/lab'
 import { ShopInfo_shop } from '@sdk/queries/types/ShopInfo'
 import { logoStructuredData } from '@temp/core/SEO/logoStructuredData'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Navigation } from 'swiper'
 import { ssrMode } from '@temp/constants'
-
-SwiperCore.use([Navigation])
 
 const breakPoints = {
 	0: {
@@ -29,15 +26,15 @@ const breakPoints = {
 	},
 	500: {
 		slidesPerView: 2,
-		slidesPerGroup: 1
+		slidesPerGroup: 2
 	},
 	1024: {
 		slidesPerView: 4,
-		slidesPerGroup: 1
+		slidesPerGroup: 4
 	},
 	1376: {
 		slidesPerView: 5,
-		slidesPerGroup: 1
+		slidesPerGroup: 5
 	}
 }
 
@@ -135,8 +132,8 @@ const Page: React.FC<{
 									spaceBetween={0}
 									slidesPerView={1}
 									width={ssrMode ? 1200 : null}
-									navigation
 									breakpoints={breakPoints}
+									navigation
 								>
 									{newProducts.edges.map((edge, i) => {
 										return (

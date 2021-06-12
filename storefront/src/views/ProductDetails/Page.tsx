@@ -21,9 +21,6 @@ import Typography from '@material-ui/core/Typography'
 import { CategoryProducts_category_products } from '@sdk/queries/types/CategoryProducts'
 import HomeIcon from '@material-ui/icons/Home'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Navigation } from 'swiper'
-
-SwiperCore.use([Navigation])
 
 const breakPoints = {
 	0: {

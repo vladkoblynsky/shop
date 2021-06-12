@@ -1,7 +1,6 @@
 import '../globalStyles/scss/index.scss'
 
 import React, { useMemo } from 'react'
-// import NextApp from 'next/app'
 import { NextQueryParamProvider } from '@temp/components/NextQueryParamProvider'
 import { App as StorefrontApp } from '@temp/app'
 import { SnackbarProvider } from 'notistack'
@@ -16,20 +15,35 @@ import {
 	desktopSsrMatchMedia,
 	mobileSsrMatchMedia
 } from '@temp/themes'
-import { ssrMode } from '@temp/constants'
-import { AppProps } from 'next/app'
-import { withApollo } from '@temp/core/withApollo'
+import { apiUrl, ssrMode } from '@temp/constants'
 import { gtmId, isDev } from '@temp/core/config'
 import TagManager from 'react-gtm-module'
-// import UAParser from 'ua-parser-js'
 import { ThemeProvider } from '@material-ui/styles'
+import withApollo from 'next-with-apollo'
+import {
+	ApolloClient,
+	ApolloLink,
+	ApolloProvider,
+	defaultDataIdFromObject,
+	InMemoryCache
+} from '@apollo/client'
+import { relayStylePagination } from '@apollo/client/utilities'
+import { onError } from '@apollo/client/link/error'
+import { isJwtError } from '@temp/core/errors'
+import { authLink, removeAuthToken } from '@temp/core/auth'
+import { BatchHttpLink } from '@apollo/client/link/batch-http'
+import { RetryLink } from '@apollo/client/link/retry'
+import { getDataFromTree } from '@apollo/client/react/ssr'
+import SwiperCore, { Lazy, Navigation, Pagination, Thumbs } from 'swiper'
 
 async function initTagManager() {
 	TagManager.initialize({
 		gtmId: gtmId
 	})
 }
-
+if (!ssrMode) {
+	SwiperCore.use([Thumbs, Navigation, Lazy, Pagination])
+}
 if (!ssrMode && !isDev && !!gtmId) {
 	initTagManager().then(() => {
 		console.log('App started! GTM initialized!')
@@ -48,23 +62,7 @@ function ErrorFallback({ error, componentStack, resetErrorBoundary }) {
 	)
 }
 
-const Root = withApollo({ ssr: true })(({ Component, ...props }: any) => {
-	return (
-		<ShopProvider>
-			<CheckoutProvider>
-				<UserProvider>
-					<ErrorBoundary FallbackComponent={ErrorFallback}>
-						<StorefrontApp>
-							<Component {...props} />
-						</StorefrontApp>
-					</ErrorBoundary>
-				</UserProvider>
-			</CheckoutProvider>
-		</ShopProvider>
-	)
-})
-
-const AppWithApollo = ({ Component, pageProps }: AppProps) => {
+const AppWithApollo = ({ Component, pageProps, apollo }) => {
 	React.useEffect(() => {
 		const jssStyles = document.querySelector('#jss-server-side')
 		if (jssStyles) {
@@ -77,13 +75,13 @@ const AppWithApollo = ({ Component, pageProps }: AppProps) => {
 			props: {
 				MuiUseMediaQuery: {
 					ssrMatchMedia:
-						pageProps.deviceType === 'mobile'
+						pageProps?.deviceType === 'mobile'
 							? mobileSsrMatchMedia
 							: desktopSsrMatchMedia
 				}
 			}
 		}
-	}, [pageProps.deviceType, defaultTheme])
+	}, [pageProps?.deviceType, defaultTheme])
 	return (
 		<ThemeProvider theme={theme}>
 			<SnackbarProvider
@@ -95,22 +93,86 @@ const AppWithApollo = ({ Component, pageProps }: AppProps) => {
 				}}
 			>
 				<NextQueryParamProvider>
-					<OverlayProvider>
-						<FavoritesProvider>
-							<Root Component={Component} {...pageProps} />
-						</FavoritesProvider>
-					</OverlayProvider>
+					<ApolloProvider client={apollo}>
+						<OverlayProvider>
+							<FavoritesProvider>
+								<ShopProvider>
+									<CheckoutProvider>
+										<UserProvider>
+											<ErrorBoundary FallbackComponent={ErrorFallback}>
+												<StorefrontApp>
+													<Component {...pageProps} />
+												</StorefrontApp>
+											</ErrorBoundary>
+										</UserProvider>
+									</CheckoutProvider>
+								</ShopProvider>
+							</FavoritesProvider>
+						</OverlayProvider>
+					</ApolloProvider>
 				</NextQueryParamProvider>
 			</SnackbarProvider>
 		</ThemeProvider>
 	)
 }
 
-// AppWithApollo.getInitialProps = async (ctx) => {
-// 	const initialProps = await NextApp.getInitialProps(ctx)
-// 	const parser = new UAParser(ctx.ctx.req.headers['user-agent'])
-// 	const deviceType = parser.getDevice().type || 'desktop'
-// 	return { pageProps: { ...initialProps, deviceType } }
-// }
+export default withApollo(
+	({ initialState, ctx, headers }) => {
+		const cache = new InMemoryCache({
+			typePolicies: {
+				Query: {
+					fields: {
+						products: relayStylePagination([
+							'categories',
+							'attributes',
+							'price',
+							'sortBy',
+							'filter',
+							'ids'
+						])
+					}
+				}
+			},
+			dataIdFromObject: (obj) => {
+				if (obj.__typename === 'Shop') {
+					return 'shop'
+				}
+				return defaultDataIdFromObject(obj)
+			}
+		}).restore(initialState || {})
+		const invalidTokenLink = onError((error: any) => {
+			console.log(error)
+			try {
+				if (
+					(error.networkError && error.networkError.statusCode === 401) ||
+					error.graphQLErrors?.some(isJwtError)
+				) {
+					removeAuthToken()
+				}
+			} catch (e) {
+				console.log(e)
+			}
+		})
 
-export default AppWithApollo
+		const batchLink = new BatchHttpLink({ uri: apiUrl, batchInterval: 50 })
+		const link = ApolloLink.from([
+			invalidTokenLink,
+			authLink,
+			new RetryLink(),
+			batchLink
+		])
+		return new ApolloClient({
+			link: link,
+			credentials: 'include',
+			headers: {
+				cookie: ctx?.req?.headers.cookie || ''
+			},
+			cache: cache,
+			ssrMode: ssrMode,
+			ssrForceFetchDelay: 100
+		})
+	},
+	{
+		getDataFromTree: getDataFromTree
+	}
+)(AppWithApollo)
