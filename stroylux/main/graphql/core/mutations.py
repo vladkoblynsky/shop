@@ -110,7 +110,8 @@ class CreateToken(ObtainJSONWebToken):
     def mutate(cls, root, info, **kwargs):
         try:
             result = super().mutate(root, info, **kwargs)
-            auth.login(info.context, result.user)
+            if result.user and result.user.is_authenticated:
+                auth.login(info.context, result.user, backend='django.contrib.auth.backends.ModelBackend')
         except JSONWebTokenError as e:
             errors = [Error(message=str(e))]
             account_errors = [
@@ -154,7 +155,11 @@ class VerifyToken(Verify):
     def mutate(cls, root, info, token, **kwargs):
         try:
             result = super().mutate(root, info, token, **kwargs)
-            auth.login(info.context, result.user)
+            try:
+                user = result.resolve_user(info, **kwargs)
+                auth.login(info.context, user, backend='django.contrib.auth.backends.ModelBackend')
+            except Exception as e:
+                print('Object does not exists')
             return result
         except JSONWebTokenError:
             return None
