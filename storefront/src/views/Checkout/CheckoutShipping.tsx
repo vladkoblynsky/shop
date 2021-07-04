@@ -1,5 +1,3 @@
-import './scss/Checkout.scss'
-
 import React, { useContext, useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { checkoutQuery } from '@sdk/queries/checkout'

@@ -1,5 +1,3 @@
-import './scss/Home.scss'
-
 import * as React from 'react'
 
 import { MetaWrapper } from '../../components'

@@ -1,5 +1,3 @@
-import './scss/Checkout.scss'
-
 import React, { useContext, useEffect, useState } from 'react'
 import Loader from '@temp/components/Loader'
 import { Container } from '@material-ui/core'

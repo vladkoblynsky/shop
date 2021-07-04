@@ -1,5 +1,3 @@
-import './scss/Checkout.scss'
-
 import React, { useContext, useEffect, useState } from 'react'
 import { useQuery } from '@apollo/client'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
