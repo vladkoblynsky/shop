@@ -1,7 +1,7 @@
 FROM node:14 as builder
 WORKDIR /app
 COPY package.json ./
-RUN yarn install
+RUN yarn install --network-timeout 1000000
 COPY . .
 ARG APP_MOUNT_URI
 ARG API_URI
