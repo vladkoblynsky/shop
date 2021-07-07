@@ -202,7 +202,6 @@ const RecommendedArticles: React.FC<IProps> = ({
 			<div className='paginator mt-2'>
 				{!!articlesData && (
 					<TablePagination
-						component='div'
 						count={articlesData.totalCount}
 						page={page}
 						onChangePage={handleChangePage}
