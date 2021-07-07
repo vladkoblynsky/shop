@@ -204,7 +204,7 @@ const RecommendedArticles: React.FC<IProps> = ({
 					<TablePagination
 						count={articlesData.totalCount}
 						page={page}
-						onChangePage={handleChangePage}
+						onPageChange={handleChangePage}
 						labelRowsPerPage={''}
 						rowsPerPageOptions={[]}
 						rowsPerPage={paginateBy}
