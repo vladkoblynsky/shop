@@ -69,10 +69,9 @@ const useStyles = makeStyles((theme) => ({
 		display: 'flex',
 		alignItems: 'center',
 		verticalAlign: 'bottom',
-		paddingLeft: 15,
-		paddingRight: 0,
+		padding: '5px 0 5px 15px',
 		fontSize: 14,
-		lineHeight: '32px',
+		lineHeight: 1.5,
 		transition: 'all .3s ease',
 		'&.active': {
 			boxShadow: '4px 1px 7px -2px #c5c5c5, 0 2px 7px -2px #c5c5c5'

@@ -174,7 +174,7 @@ const Footer: React.FC = () => {
 							<Typography variant='h5' gutterBottom>
 								Каталог товаров:
 							</Typography>
-							<Collapse in={isOpenAllCategories} collapsedHeight={200}>
+							<Collapse in={isOpenAllCategories} collapsedSize={200}>
 								<ul className={classes.categoriesGroupList}>
 									{dataCategories?.categories.edges.map((edge, i) => (
 										<li key={i}>
