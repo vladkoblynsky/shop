@@ -115,7 +115,10 @@ const Footer: React.FC = () => {
 	const { data: dataCategories } = useQuery<Categories, CategoriesVariables>(
 		categoriesQuery,
 		{
-			variables: { level: 0 }
+			variables: { level: 0 },
+			fetchPolicy: 'cache-first',
+			nextFetchPolicy: 'cache-first',
+			ssr: false
 		}
 	)
 	const { data: pagesData } = usePages({

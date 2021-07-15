@@ -169,7 +169,7 @@ export default withApollo(
 			},
 			cache: cache,
 			ssrMode: ssrMode,
-			ssrForceFetchDelay: 100
+			ssrForceFetchDelay: 0
 		})
 	},
 	{

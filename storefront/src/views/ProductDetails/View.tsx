@@ -61,7 +61,8 @@ const View: React.FC = () => {
 		skip: !data,
 		fetchPolicy: 'cache-first',
 		nextFetchPolicy: 'cache-first',
-		notifyOnNetworkStatusChange: true
+		notifyOnNetworkStatusChange: true,
+		ssr: false
 	})
 	const { data: categoryProductsData } = useQuery<
 		CategoryProducts,
@@ -73,7 +74,8 @@ const View: React.FC = () => {
 		},
 		skip: !data,
 		fetchPolicy: 'cache-first',
-		nextFetchPolicy: 'cache-first'
+		nextFetchPolicy: 'cache-first',
+		ssr: false
 	})
 	const loadMoreReviews = async (): Promise<void> => {
 		await fetchMore({

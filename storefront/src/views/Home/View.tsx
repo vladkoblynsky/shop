@@ -35,7 +35,6 @@ const View: React.FC = () => {
 		},
 		fetchPolicy: 'cache-first',
 		nextFetchPolicy: 'cache-first'
-		// ssr: false
 	})
 	const { data: popularProductsData } = useQuery<
 		ProductsCardDetails,
@@ -50,8 +49,8 @@ const View: React.FC = () => {
 			includeCategory: false
 		},
 		fetchPolicy: 'cache-first',
-		nextFetchPolicy: 'cache-first'
-		// ssr: false
+		nextFetchPolicy: 'cache-first',
+		ssr: false
 	})
 	const { data: articlesData, loading: articlesLoading } = useQuery<
 		BlogArticleList,
@@ -66,12 +65,13 @@ const View: React.FC = () => {
 			}
 		},
 		fetchPolicy: 'cache-first',
-		nextFetchPolicy: 'cache-first'
+		nextFetchPolicy: 'cache-first',
+		ssr: false
 	})
 	return (
 		<MetaWrapper meta={{}}>
 			<Page
-				loading={!newProductsData}
+				loading={!newProductsData || !popularProductsData}
 				newProducts={newProductsData?.products}
 				popularProducts={popularProductsData?.products}
 				articlesEdges={articlesData?.blogArticleList?.edges}

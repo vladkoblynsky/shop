@@ -489,7 +489,8 @@ class Category(CountableDjangoObjectType):
     @staticmethod
     def resolve_thumbnail(root: models.Category, info, size='255x255',
                           method='thumbnail_webp'):
-        url = get_thumbnail(root.background_image, size, method)
+        url = get_thumbnail(root.background_image, size, method,
+                            rendition_key_set='background_images')
         return Image(alt=root.background_image_alt,
                      url=build_absolute_uri(url))
 

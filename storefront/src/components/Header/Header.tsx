@@ -96,7 +96,9 @@ const Header: React.FC = () => {
 		categoriesQuery,
 		{
 			variables: { level: 0 },
-			nextFetchPolicy: 'cache-first'
+			fetchPolicy: 'cache-first',
+			nextFetchPolicy: 'cache-first',
+			ssr: false
 		}
 	)
 	const { data: pagesData } = usePages({

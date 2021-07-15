@@ -104,7 +104,8 @@ const View: React.FC = () => {
 			filter: { inCategory: id }
 		},
 		fetchPolicy: 'cache-first',
-		nextFetchPolicy: 'cache-first'
+		nextFetchPolicy: 'cache-first',
+		ssr: false
 		// skip:
 		// 	!!categoryLoading || !!categoryResponse?.category?.children?.edges.length
 	})
